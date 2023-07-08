@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Or Join Meeting</title>
+    <link rel="stylesheet" href="public/Assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="public/Assets/css/style.css">
+
+</head>
+<body style="padding-top: 3.5rem;">
+    <nav class="navbar navbar-expand-md fixed-top">
+        <div class="navbar-res">
+        <img src="public/assets/images/google-meet-icon.png" class="logo" alt="">
+        <a href="#" class="navbar-brand text-dark">Google Meet</a></div>
+        <div class="navbar-collapse">
+            <ul class="navbar-nav mr-auto navbar-other-page">
+                <li class="nav-item">
+                    <a href="#" class="nav-link">At a glance</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">How it works</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">Plan and Price</a>
+                </li>
+            </ul>
+            <ul class="navbar-nav mr-0">
+                <li class="nav-item sign-in display-center">
+                    <div class="login-info">
+                    <img id="image" />
+                </div>
+                    <button class="logout" onclick="logout()">logout</button>
+                </li>
+                <li class="nav-item nav-button">
+                    <button class="btn btn-outline-secondary btn-lg text-info font-weight-bold join-meeting" >Join the meeting</button>
+                </li>
+                <li class="nav-item nav-button">
+                    <button class="btn btn-lg btn-info text-light font-weight-bold new-meeting" style="background: rgb(26,115,232);">Start a meeting</button>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <main>
+        <div class="jumbotron h-100">
+            <div class="container">
+                <h1 style="font-size: 3rem;"> Premium video meeting. Now for free to everyone. </h1>
+                <p style="font-size: 20px;">
+                    We're redesigning the Google Meet service for secure business meetings and making it free for everyone to use.
+                </p>
+                <ul class="display-center justify-content-start" >
+                    <li style="padding: 0;">
+                        <button class="btn btn-lg text-light font-weight-bold display-center new-meeting" style="background-color: rgb(26,115,232);"><span class="material-icons mr-2">video_call</span>New Meeting</button>
+                    </li>
+                    <li class="pl-3">
+                        <button class="btn btn-lg btn-outline-secondary text-dark font-weight-bold display-center" style="background-color: #ffffff;"><span class="material-icons mr-2">keyboard</span><input type="text" placeholder="Enter a code" style="border: none;" class="enter-code"></button>
+                    </li>
+                    <li class="text-dark font-weight-bold cursor-pointer pl-2 join-action">Join</li>
+                </ul>
+            </div>
+            <div class="container">
+                <img src="public/Assets/images/image1.webp" alt="" class="signin-image">
+            </div>
+        </div>
+    </main>
+    <footer class="container"><h6>Learn more about <span class="learn-more text-info">google meet</span> .</h6></footer>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <script>
+        $(function(){
+            $(document).on("click", ".join-meeting", function(){
+                $(".enter-code").focus();
+            })
+            $(document).on("click", ".join-action", function(){
+                var join_value = $('.enter-code').val();
+                var meetingUrl = window.location.origin+"?meetingID="+join_value;
+                window.location.replace(meetingUrl);
+            })
+            $(document).on("click", ".new-meeting", function(){
+               var eight_d_value = Math.floor(Math.random()*100000000);
+                var meetingUrl = window.location.origin+"?meetingID="+eight_d_value;
+                window.location.replace(meetingUrl);
+            })
+
+        })
+
+
+let params = {}
+var  regex = /([^&=]+)=([^&]*)/g,m
+
+while(m= regex.exec(location.href)){
+    params[decodeURIComponent(m[1])] = decodeURIComponent(m[2])
+}
+
+if(Object.keys(params).length>0){
+    localStorage.setItem('authInfo',JSON.stringify(params))
+}
+
+// hide the acess token
+
+window.history.pushState({},document.title,"/"+"login.html")
+
+let info = JSON.parse(localStorage.getItem('authInfo'))
+console.log(JSON.parse(localStorage.getItem('authInfo')))
+console.log(info['access_token'])
+console.log(info['ecpires_in'])
+
+fetch("https://www.googleapis.com/oauth2/v3/userinfo",{
+    headers:{
+        "Authorization": `Bearer ${info['access_token']}`
+    }
+})
+.then((data)=> data.json())
+.then((info)=>{
+    console.log(info)
+    // document.getElementById("name").innerHTML += info.name
+    document.getElementById("image").setAttribute('src',info.picture)
+})
+
+function logout(){
+    fetch("https://oauth2.googleapis.com/revoke?token="+info['access_token'],{
+    method:'POST',
+    headers:{
+        'content-type':'application/x-www-form-urlencoded'
+    }
+})
+.then((data)=>{
+    location.href = "http://127.0.0.1:3000/action.html"
+})
+}
+
+</script>
+</body>
+</html>
